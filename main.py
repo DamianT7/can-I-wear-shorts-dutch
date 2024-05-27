@@ -4,10 +4,13 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 import time
+import os
+from dotenv import load_dotenv
+
+load_dotenv(".env")
 
 app = Flask(__name__)
 
-# Cache dictionary to store the result and the timestamp
 cache = {
     "result": None,
     "timestamp": 0
@@ -17,9 +20,21 @@ cache = {
 CACHE_DURATION = 10800
 
 def can_wear_shorts():
+    
     service = Service(ChromeDriverManager().install())
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
+
+    if(os.getenv('ENV') == 'production'):
+        service = Service(executable_path=r'/usr/local/bin/chromedriver')
+        options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36") # headless fix??
+        options.add_argument("--window-size=1920,1080") # headless fix??
+
+        options.add_argument("--disable-gpu")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        # options.add_argument("--remote-debugging-port=9222")
+    
     driver = webdriver.Chrome(service=service, options=options)
     
     try:
@@ -57,4 +72,4 @@ def api_can_wear_shorts():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=9002)
+    app.run(host='0.0.0.0', port=os.getenv('PORT'))
