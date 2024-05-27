@@ -16,8 +16,8 @@ cache = {
     "timestamp": 0
 }
 
-# Cache duration in seconds (3 hours)
-CACHE_DURATION = 10800
+# Cache duration in seconds
+CACHE_DURATION = os.getenv('10800')
 
 def can_wear_shorts():
     
